@@ -4,7 +4,7 @@ learn about deep learning
 
 ## Date
 1. 5/11
-
+2. 5/12
 
 ## Contents
 ### 5/11
@@ -17,3 +17,7 @@ learn about deep learning
     [YOLO_label](https://github.com/developer0hye/Yolo_Label)
 - [ROS wiki](http://wiki.ros.org/ROS/Tutorials)
     - 읽는 중
+
+### 5/12
+- ROS wiki 읽고 ROS_Basic.md 파일 작성
+    - pinkwink 자료 포함
