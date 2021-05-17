@@ -6,7 +6,9 @@ learn about deep learning
 1. 5/11
 2. 5/12
 3. 5/13
-3. 5/15
+4. 5/15
+5. 5/16
+6. 5/17
 
 ## Contents
 ### 5/11
@@ -36,3 +38,8 @@ learn about deep learning
     - **현재의 cv2.dnn 모듈을 사용하는 코드는 fps가 느려서 개선이 필요**
     - input image frame을 낮추었는데, 이러면 학습을 더 시켜야함
     - 혹은 yolo5 사용.
+
+### 5/16
+- 발표용 ppt 작성
+### 5/17
+- 강사님이 배포하신 ROS 강의자료 공부 ~ rosbag 까지
