@@ -1,26 +1,22 @@
-"""
-1. 드론이 카메라만 켜진 상태에서 마스크를 착용한 사람이 detecting 되면 떠오른다.(고 추정하는 코드)
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-"""
+from logging import log
 import cv2
 import numpy as np
 import time
 from djitellopy import Tello
 
-
 me = Tello()
 me.connect()
-print(me.get_battery())
+print(11, me.get_battery())
 
+try:
+  me.streamon()
+except:
+  print("Could not start video stream")
 
-try :
-    me.streamon()
-except :
-    print("Could not start video stream")
-# if not me.streamon():
-#     print("Could not start video stream")
-
-frame_read = me.get_frame_read().frame
+frame_read = me.get_frame_read()
 
 net = cv2.dnn.readNet('weights/yolov3_train_last.weights', 'cfgs/yolov3_masks.cfg')
 net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
@@ -40,21 +36,21 @@ IS_FLYING = False
 
 # mask status
 ALL_WITH_MASK = True
-hover_time = 0
+all_with_mask_time = 0
 
 while True:
     start_time = time.time()
-    img = cv2.resize(frame_read, (360, 240))
+    # ret, frame = frame_read.frame
+    # print(frame)
+    img = cv2.resize(frame_read.frame, (360, 240))
     # height, width, _ = img.shape
 
     boxes = []
     confidences = []
     class_ids = []
 
-    # 4. 이미지를 blob(Binary Large Object) 으로 변환하고 사이즈도 줄여서 네트워크에 넣기
     blob = cv2.dnn.blobFromImage(img, 1/255.0, (320, 320), (0,0,0), swapRB=True, crop=False)
     net.setInput(blob)
-
 
     # 5. output layer에서 결과 받기
     # ln = net.getLayerNames()
@@ -93,26 +89,27 @@ while True:
             cv2.putText(img, label + " " + confidence, (x, y+20), font, 2, (255, 255, 255), 2)
 
     loop_time = time.time() - start_time
+
     # find mask man
-    if 1 in class_ids:
-        print("==============find without mask person==========")
+    if (1 in class_ids) & (not IS_FLYING):
+        # print("==============find without mask person==========")
+        print('🚀🚀🚀 DRONE TAKES OFF !!')
+        me.takeoff()
+        IS_FLYING = True
         ALL_WITH_MASK == False
-        mask_safe_time = 0
-        if not IS_FLYING :
-            print('============drone takes off============')
-            # me.takeoff()
-            IS_FLYING = True
+        # all_with_mask_time = 0
 
     # 10초 지나면 다시 착륙
     if (ALL_WITH_MASK == True) & (IS_FLYING == True):
-        mask_safe_time += loop_time
-        print(mask_safe_time)
-        if mask_safe_time > 10:
-            print('============drone land =============')
-            mask_safe_time = 0
+        all_with_mask_time += loop_time
+        print(all_with_mask_time)
+
+        if all_with_mask_time > 10:
+            print('🪂🪂🪂 DRONE LANDS !!')
+            me.land()
+            all_with_mask_time = 0
             IS_FLYING = False
             time.sleep(2)
-
 
     # 화면 출력 스케일 조절
     # scale_percent = 50
