@@ -1,12 +1,9 @@
 from djitellopy import Tello
 import cv2
 import numpy as np
-import time
-import datetime
-import os
 import argparse
-from keyboardControl import KeyboardControler
-from TelloMaskTracking import MaskTracking
+from tello_keyboard_control import KeyboardControler
+from tello_withoutmask_tracking import MaskTracking
 
 
 # standard argparse stuff
@@ -107,15 +104,15 @@ class FrontEnd(object):
             print("================= Could not start video stream =================")
             return
 
-        # In case streaming is on. This happens when we quit this program without the escape key.
-        # if not self.tello.streamoff():
-        #     print("================= Could not stop video stream =================")
-        #     return
+        width, height = 1050, 700
+
+        # init controllers
+        keyboardController = KeyboardControler(self.tello)
+        maskDetector = MaskTracking(width, height, self.tello.takeoff, self.tello.send_rc_control, 0.6)
 
         # frame read
         frame_read = self.tello.get_frame_read()
 
-        imgCount = 0
         OVERRIDE = False # 이게 True면 키보드 조종이 가능한 상태
         oSpeed = args.override_speed
         tDistance = args.distance
@@ -127,13 +124,7 @@ class FrontEnd(object):
         if args.debug:
             print("================= DEBUG MODE ENABLED! =================")
 
-        width, height = 1050, 700
-
-        # init controllers
-        keyboardController = KeyboardControler(self.tello)
-        maskDetector = MaskTracking(width, height, self.tello)
-
-
+       
         while True:
             self.update()
 

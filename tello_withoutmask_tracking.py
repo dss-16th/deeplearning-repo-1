@@ -1,4 +1,4 @@
-from djitellopy import Tello
+# from djitellopy import Tello 
 import cv2
 import numpy as np
 import time
@@ -13,32 +13,42 @@ frame_center_y = int(dimensions[1] / 2)
 speed = 20
 
 class MaskTracking:
-    def __init__(self, frame_width, frame_height, tello:Tello, confidence=0.5):
-        self.tello = tello
+    def __init__(self, frame_width, frame_height, takeoff, send_rc_control, confidence=0.5):
+        self.takeoff = takeoff
+        self.send_rc_control = send_rc_control
         self.confidence = confidence
+
         self.width = frame_width
         self.height = frame_height
+        
         self.all_with_mask_time = 0
+        self.is_flying = False
 
-        self.for_back_velocity = 0
-        self.yaw_velocity = 0
-        self.up_down_velocity = 0
-        self.left_right_velocity = 0
-        self.IS_FLYING = False
+        self.forward_backward_vel = 0
+        self.yaw_vel = 0
+        self.up_down_vel = 0
+        self.left_right_vel = 0
+        
 
         # yolov3 net
-        self.net = cv2.dnn.readNet('weights/yolov3_train_last.weights', 'cfgs/yolov3_masks.cfg')
+        self.net = cv2.dnn.readNet('model/object_detection/yolov3_train_last.weights', 'model/object_detection/yolov3_masks.cfg')
         self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
         print("🛰🛰🛰 net is working")
 
         self.classes = []
-        with open('datas/masks.names','r') as f:
+        with open('model/object_detection/masks.names','r') as f:
             self.classes = f.read().splitlines()
         print("====> classes :",self.classes)
 
         # settings
         self.font = cv2.FONT_HERSHEY_PLAIN
         self.colors = np.random.uniform(0, 255, size=(len(self.classes), 3))
+
+    def is_with_mask(class_ids):
+        return 1 not in class_ids
+
+    def is_without_mask(class_ids):
+        return 1 in class_ids
 
     def detect_mask(self, frame, szX, szY):
         start_time = time.time()
@@ -76,6 +86,7 @@ class MaskTracking:
 
         else:
             indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+
             for i in indexes.flatten():
                 x, y, w, h = boxes[i]
                 label = str(self.classes[class_ids[i]])
@@ -84,25 +95,26 @@ class MaskTracking:
                 cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
                 cv2.putText(frame, label + " " + confidence, (x, y+20), self.font, 2, (255, 255, 255), 2)
 
+
             # 대기 상태
-            if not self.IS_FLYING:
-                if (1 in class_ids):
+            if not self.is_flying:
+                if self.is_without_mask():
                     print('🚀🚀🚀 DRONE TAKES OFF !!')
-                    self.tello.takeoff()
-                    self.IS_FLYING = True
+                    self.takeoff()
+                    self.is_flying = True
 
             else:
-                if (1 not in class_ids):
+                if self.is_with_mask():
                     iter_time = time.time() - start_time
                     self.all_with_mask_time += iter_time
                     print('all with_mask duration :',round(self.all_with_mask_time, 3))
-                    self.tello.send_rc_control(0,0,0,0)
+                    # self.tello.send_rc_control(0,0,0,0)
 
                     if self.all_with_mask_time > 10:
                         print('🪂🪂🪂 DRONE LANDS !!')
                         # me.land()
                         self.all_with_mask_time = 0
-                        self.IS_FLYING = False
+                        self.is_flying = False
                         time.sleep(2)
 
                 # without_mask가 감지되었을 경우
@@ -122,19 +134,19 @@ class MaskTracking:
 
                             # for turning
                             if vDistance[0] < -szX:
-                                self.yaw_velocity = speed
+                                self.yaw_vel = speed
                             elif vDistance[0] > szX:
-                                self.yaw_velocity = -speed
+                                self.yaw_vel = -speed
                             else:
-                                self.yaw_velocity = 0
+                                self.yaw_vel = 0
                             
                             # for up & down
                             if vDistance[1] > szY:
-                                self.up_down_velocity = speed
+                                self.up_down_vel = speed
                             elif vDistance[1] < -szY:
-                                self.up_down_velocity = -speed
+                                self.up_down_vel = -speed
                             else:
-                                self.up_down_velocity = 0
+                                self.up_down_vel = 0
 
                             F = 0
                             if abs(vDistance[2]) > 250:
@@ -142,11 +154,11 @@ class MaskTracking:
 
                             # for forward back
                             if vDistance[2] > 0:
-                                self.for_back_velocity = speed + F
+                                self.forward_backward_vel = speed + F
                             elif vDistance[2] < 0:
-                                self.for_back_velocity = -speed - F
+                                self.forward_backward_vel = -speed - F
                             else:
-                                self.for_back_velocity = 0
+                                self.forward_backward_vel = 0
 
                             # center circle
                             cv2.circle(frame, (targ_cord_x, targ_cord_y), 10, (0,255,0), 2)
@@ -156,5 +168,5 @@ class MaskTracking:
 
                             cv2.putText(frame, str(vDistance), (0, 64), self.font, 1, (255, 255, 255), 2)
 
-                            self.tello.send_rc_control(self.left_right_velocity, self.for_back_velocity, self.up_down_velocity, self.yaw_velocity)
+                            self.send_rc_control(self.left_right_vel, self.forward_backward_vel, self.up_down_vel, self.yaw_vel)
                             return
