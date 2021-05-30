@@ -4,6 +4,8 @@ import numpy as np
 import argparse
 from tello_keyboard_control import KeyboardControler
 from tello_withoutmask_tracking import MaskTracking
+from tello_gesture_control import TelloGestureController
+from gesture_recognition import *
 
 
 # standard argparse stuff
@@ -109,6 +111,7 @@ class FrontEnd(object):
         # init controllers
         keyboardController = KeyboardControler(self.tello)
         maskDetector = MaskTracking(width, height, self.tello.takeoff, self.tello.send_rc_control, 0.6)
+        gesture_controller = TelloGestureController(self.tello)
 
         # frame read
         frame_read = self.tello.get_frame_read()
