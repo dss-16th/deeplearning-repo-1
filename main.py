@@ -2,6 +2,7 @@ from djitellopy import Tello
 import cv2
 import numpy as np
 import argparse
+import time
 from tello_keyboard_control import KeyboardControler
 from tello_withoutmask_tracking import MaskTracking
 from tello_gesture_control import TelloGestureController
@@ -106,16 +107,24 @@ class FrontEnd(object):
             print("================= Could not start video stream =================")
             return
 
-        width, height = 1050, 700
+        # init controller
+        if self.tello_mode == 'k':
+            keyboardController = KeyboardControler(self.tello)
 
-        # init controllers
-        keyboardController = KeyboardControler(self.tello)
-        maskDetector = MaskTracking(width, height, self.tello.takeoff, self.tello.send_rc_control, 0.6)
-        gesture_controller = TelloGestureController(self.tello)
+        elif self.tello_mode == 'm':
+            width, height = 1050, 700
+            maskDetector = MaskTracking(width, height, self.tello.takeoff, self.tello.send_rc_control, 0.6)
+
+        elif self.tello_mode == 'g':
+            gesture_controller = TelloGestureController(self.tello)
+            gesture_detector = GestureRecognition()
+            gesture_buffer = GestureBuffer()
 
         # frame read
         frame_read = self.tello.get_frame_read()
 
+        battery_status = self.tello.get_battery()
+        
         OVERRIDE = False # 이게 True면 키보드 조종이 가능한 상태
         oSpeed = args.override_speed
         tDistance = args.distance
@@ -129,6 +138,8 @@ class FrontEnd(object):
 
        
         while True:
+            start_ts = time.time()
+            
             self.update()
 
             if frame_read.stopped:
@@ -169,18 +180,17 @@ class FrontEnd(object):
 
             ## ==> GESTURE CONTROL MODE !!
             if self.tello_mode == 'g':
-                gesture_controller.gesture_control()
+                debug_image, gesture_id = gesture_detector.recognize(frame)
+                gesture_buffer.add_gesture(gesture_id)
+                gesture_controller.gesture_control(gesture_buffer)
+                fps = 1000./time.time() - start_ts
 
-            dCol = lerp(np.array((0, 0, 255)), np.array((255, 255, 255)), tDistance + 1 / 7)
 
-            if OVERRIDE:
-                show = "OVERRIDE: {}".format(oSpeed) # default = 1
-                dCol = (255, 255, 255)
-            else:
-                show = "AI: {}".format(str(tDistance)) # default = 3
+                debug_image = gesture_detector.draw_info(debug_image, fps, mode=0, number=-1)
 
-            # Draw the distance choosen
-            cv2.putText(frame, show, (32, 664), cv2.FONT_HERSHEY_SIMPLEX, 1, dCol, 2)
+                # Battery status and image rendering
+                cv.putText(debug_image, "Battery: {}".format(battery_status), (5, 720 - 5),
+                        cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
             # Display the resulting frame
             cv2.imshow(f'Tello Tracking 🧟 ....', frame)
