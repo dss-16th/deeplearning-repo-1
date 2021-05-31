@@ -70,6 +70,10 @@ class TelloGestureController:
                 print('================== VIDEO2')
                 # self.onoff_tello_video()
                 return
+            # Rock paper scissors
+            if gesture_id == 7:
+                print('================== 👊🏻👊🏼👊🏽👊🏾👊🏿')
+                return
 
 
     def send_tello_control(self):

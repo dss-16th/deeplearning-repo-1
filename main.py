@@ -34,19 +34,14 @@ args = parser.parse_args()
 # Speed of the drone
 S = 20
 # S2 = 5
-UDOffset = 150
+# UDOffset = 150
 
 # this is just the bound box sizes that openCV spits out *shrug*
-faceSizes = [1026, 684, 456, 304, 202, 136, 90]
+# faceSizes = [1026, 684, 456, 304, 202, 136, 90]
 
 # These are the values in which kicks in speed up mode, as of now, this hasn't been finalized or fine tuned so be careful
 # Tested are 3, 4, 5
-acc = [500, 250, 250, 150, 110, 70, 50]
-
-# Frames per second of the pygame window display
-FPS = 25
-dimensions = (960, 720)
-
+# acc = [500, 250, 250, 150, 110, 70, 50]
 
 # # If we are to save our sessions, we need to make sure the proper directories exist
 # if args.save_session:
@@ -108,7 +103,8 @@ class FrontEnd(object):
             print("================= Could not start video stream =================")
             return
 
-        width, height = 1050, 700
+        width, height = 1050, 720
+
         # init controller
         if self.tello_mode == 'k':
             keyboardController = KeyboardControler(self.tello)
@@ -125,7 +121,11 @@ class FrontEnd(object):
         # frame read
         frame_read = self.tello.get_frame_read()
 
-        battery_status = self.tello.get_battery()
+        # battery_status
+        if self.tello.get_battery()[:3] == '100':
+            battery_status = 100
+        else:
+            battery_status = self.tello.get_battery()[:2]
         
         OVERRIDE = False # 이게 True면 키보드 조종이 가능한 상태
 
@@ -188,7 +188,9 @@ class FrontEnd(object):
                     debug_image, gesture_id = gesture_detector.recognize(frame)
                     gesture_buffer.add_gesture(gesture_id)
                     gesture_controller.gesture_control(gesture_buffer)
-                    fps = 1000./time.time() - start_ts
+
+                    fps = 1.0 /(time.time() - start_ts)
+                    fps_rounded = round(fps, 2)
 
                     # ==> tracking owner
                     cv2.rectangle(debug_image, (left, top), (right, bottom), (0, 0, 255), 2)
@@ -202,7 +204,7 @@ class FrontEnd(object):
                     debug_image = gesture_detector.draw_info(debug_image, fps, mode=0, number=-1)
 
                     # Battery status and image rendering
-                    cv.putText(debug_image, "Battery: {}".format(battery_status), (5, 720 - 5),
+                    cv.putText(debug_image, "Battery: {}".format(battery_status), (10, 720 - 10),
                             cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                     cv.imshow('Tello Gesture Recognition', debug_image)
 
@@ -218,8 +220,8 @@ class FrontEnd(object):
         # Call it always before finishing. I deallocate resources.
         self.tello.end()
 
-    def battery(self):
-        return self.tello.get_battery()[:2]
+    # def battery(self):
+    #     return self.tello.get_battery()[:2]
 
 
 def lerp(a, b, c):
