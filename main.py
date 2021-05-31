@@ -107,12 +107,12 @@ class FrontEnd(object):
             print("================= Could not start video stream =================")
             return
 
+        width, height = 1050, 700
         # init controller
         if self.tello_mode == 'k':
             keyboardController = KeyboardControler(self.tello)
 
         elif self.tello_mode == 'm':
-            width, height = 1050, 700
             maskDetector = MaskTracking(width, height, self.tello.takeoff, self.tello.send_rc_control, 0.6)
 
         elif self.tello_mode == 'g':
@@ -140,8 +140,6 @@ class FrontEnd(object):
         while True:
             start_ts = time.time()
             
-            self.update()
-
             if frame_read.stopped:
                 frame_read.stop()
                 break
@@ -191,9 +189,10 @@ class FrontEnd(object):
                 # Battery status and image rendering
                 cv.putText(debug_image, "Battery: {}".format(battery_status), (5, 720 - 5),
                         cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                cv.imshow('Tello Gesture Recognition', debug_image)
 
             # Display the resulting frame
-            cv2.imshow(f'Tello Tracking 🧟 ....', frame)
+            # cv2.imshow(f'Tello Tracking 🧟 ....', frame)
 
         # On exit, print the battery
         self.tello.get_battery()
@@ -206,12 +205,6 @@ class FrontEnd(object):
 
     def battery(self):
         return self.tello.get_battery()[:2]
-
-    def update(self):
-        """Update routine. Send velocities to Tello."""
-        if self.send_rc_control:
-            self.tello.send_rc_control(self.left_right_velocity, self.for_back_velocity, self.up_down_velocity,
-                                       self.yaw_velocity)
 
 
 def lerp(a, b, c):
