@@ -7,6 +7,7 @@ from tello_keyboard_control import KeyboardControler
 from tello_withoutmask_tracking import MaskTracking
 from tello_gesture_control import TelloGestureController
 from gesture_recognition import *
+from owner_face_recognition import FaceRecognition
 
 
 # standard argparse stuff
@@ -74,7 +75,7 @@ class FrontEnd(object):
 
         # drone status 
         self.send_rc_control = False
-        self.IS_FLYING = False
+        self.is_flying = False
 
         # mask status
         self.all_with_mask_time = 0
@@ -113,9 +114,10 @@ class FrontEnd(object):
             keyboardController = KeyboardControler(self.tello)
 
         elif self.tello_mode == 'm':
-            maskDetector = MaskTracking(width, height, self.tello.takeoff, self.tello.send_rc_control, 0.6)
+            maskDetector = MaskTracking(width, height, self.tello.takeoff, self.tello.send_rc_control, confidence=0.6)
 
         elif self.tello_mode == 'g':
+            face_checker = FaceRecognition()
             gesture_controller = TelloGestureController(self.tello)
             gesture_detector = GestureRecognition()
             gesture_buffer = GestureBuffer()
@@ -126,8 +128,7 @@ class FrontEnd(object):
         battery_status = self.tello.get_battery()
         
         OVERRIDE = False # 이게 True면 키보드 조종이 가능한 상태
-        oSpeed = args.override_speed
-        tDistance = args.distance
+
         self.tello.get_battery()
 
         # Safety Zone X, Y
@@ -178,18 +179,32 @@ class FrontEnd(object):
 
             ## ==> GESTURE CONTROL MODE !!
             if self.tello_mode == 'g':
-                debug_image, gesture_id = gesture_detector.recognize(frame)
-                gesture_buffer.add_gesture(gesture_id)
-                gesture_controller.gesture_control(gesture_buffer)
-                fps = 1000./time.time() - start_ts
+                top, right, bottom, left, owner_name = face_checker.recognize(frame)
 
+                if owner_name & (not self.is_flying):
+                        print('🚀🚀🚀 DRONE TAKES OFF !!')
+                        self.is_flying == True
+                elif self.is_flying:
+                    debug_image, gesture_id = gesture_detector.recognize(frame)
+                    gesture_buffer.add_gesture(gesture_id)
+                    gesture_controller.gesture_control(gesture_buffer)
+                    fps = 1000./time.time() - start_ts
 
-                debug_image = gesture_detector.draw_info(debug_image, fps, mode=0, number=-1)
+                    # ==> tracking owner
+                    cv2.rectangle(debug_image, (left, top), (right, bottom), (0, 0, 255), 2)
 
-                # Battery status and image rendering
-                cv.putText(debug_image, "Battery: {}".format(battery_status), (5, 720 - 5),
-                        cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                cv.imshow('Tello Gesture Recognition', debug_image)
+                    # Draw a label with a name below the face
+                    cv2.rectangle(debug_image, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+                    font = cv2.FONT_HERSHEY_DUPLEX
+                    cv2.putText(debug_image, owner_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+
+                    # ==> tracking gesture
+                    debug_image = gesture_detector.draw_info(debug_image, fps, mode=0, number=-1)
+
+                    # Battery status and image rendering
+                    cv.putText(debug_image, "Battery: {}".format(battery_status), (5, 720 - 5),
+                            cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                    cv.imshow('Tello Gesture Recognition', debug_image)
 
             # Display the resulting frame
             # cv2.imshow(f'Tello Tracking 🧟 ....', frame)

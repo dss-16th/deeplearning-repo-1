@@ -2,6 +2,7 @@ from djitellopy import Tello
 import os
 import cv2
 import datetime
+from owner_face_recognition import FaceRecognition
 
 
 speed = 20
