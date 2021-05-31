@@ -17,7 +17,7 @@ class FaceRecognition:
         self.tello_owner_list, self.tello_owner_names = self.load_model()
 
     def load_model(self):
-        target_image = face_recognition.load_image_file("model/target_image/sample.jpg")
+        target_image = face_recognition.load_image_file("model/face_recognition/target_img/mieyhgnaj.jpg")
         encoding_image = face_recognition.face_encodings(target_image)[0]
 
         # Create owner

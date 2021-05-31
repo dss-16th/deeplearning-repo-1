@@ -179,34 +179,38 @@ class FrontEnd(object):
 
             ## ==> GESTURE CONTROL MODE !!
             if self.tello_mode == 'g':
-                top, right, bottom, left, owner_name = face_checker.recognize(frame)
+                owner_name = 'Nobody'
+                top, right, bottom, left = 0,0,0,0
+                try:
+                    top, right, bottom, left, owner_name = face_checker.recognize(frame)
+                except:
+                    pass
+                if (owner_name != 'Nobody') & (not self.is_flying):
+                    print('🚀🚀🚀 DRONE TAKES OFF !!')
+                    self.is_flying == True
+                    
+                debug_image, gesture_id = gesture_detector.recognize(frame)
+                gesture_buffer.add_gesture(gesture_id)
+                gesture_controller.gesture_control(gesture_buffer)
 
-                if owner_name & (not self.is_flying):
-                        print('🚀🚀🚀 DRONE TAKES OFF !!')
-                        self.is_flying == True
-                elif self.is_flying:
-                    debug_image, gesture_id = gesture_detector.recognize(frame)
-                    gesture_buffer.add_gesture(gesture_id)
-                    gesture_controller.gesture_control(gesture_buffer)
+                fps = 1.0 /(time.time() - start_ts)
+                fps_rounded = round(fps, 2)
 
-                    fps = 1.0 /(time.time() - start_ts)
-                    fps_rounded = round(fps, 2)
+                # ==> tracking owner
+                cv2.rectangle(debug_image, (left, top), (right, bottom), (0, 0, 255), 2)
 
-                    # ==> tracking owner
-                    cv2.rectangle(debug_image, (left, top), (right, bottom), (0, 0, 255), 2)
+                # Draw a label with a name below the face
+                cv2.rectangle(debug_image, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+                font = cv2.FONT_HERSHEY_DUPLEX
+                cv2.putText(debug_image, owner_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
-                    # Draw a label with a name below the face
-                    cv2.rectangle(debug_image, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-                    font = cv2.FONT_HERSHEY_DUPLEX
-                    cv2.putText(debug_image, owner_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+                # ==> tracking gesture
+                debug_image = gesture_detector.draw_info(debug_image, fps, mode=0, number=-1)
 
-                    # ==> tracking gesture
-                    debug_image = gesture_detector.draw_info(debug_image, fps, mode=0, number=-1)
-
-                    # Battery status and image rendering
-                    cv.putText(debug_image, "Battery: {}".format(battery_status), (10, 720 - 10),
-                            cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                    cv.imshow('Tello Gesture Recognition', debug_image)
+                # Battery status and image rendering
+                cv.putText(debug_image, "Battery: {}".format(battery_status), (10, 720 - 10),
+                        cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                cv.imshow('Tello Gesture Recognition', debug_image)
 
             # Display the resulting frame
             # cv2.imshow(f'Tello Tracking 🧟 ....', frame)

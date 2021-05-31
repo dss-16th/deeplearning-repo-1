@@ -133,3 +133,6 @@ dmypy.json
 
 # weights
 *.weights
+
+# target_img
+model/face_recognition/target_img/

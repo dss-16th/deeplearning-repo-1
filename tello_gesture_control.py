@@ -9,7 +9,6 @@ speed = 20
 class TelloGestureController:
     def __init__(self, tello: Tello):
         self.tello = tello
-        self._is_takeoff = False
 
         # RC control velocities
         self.forward_backward_vel = 0
@@ -19,61 +18,47 @@ class TelloGestureController:
         
     def gesture_control(self, gesture_buffer):
         gesture_id = gesture_buffer.get_gesture()
-        print("GESTURE : ", gesture_id, type(gesture_id))
+        if gesture_id != None :
+            print("GESTURE : ", gesture_id, type(gesture_id))
 
-        if not self._is_takeoff :
-            if gesture_id :
-                print("============================hi")
-                # self.tello.takeoff()
-                self._is_takeoff = True
-                return
-
-        else:
-            # Stop
-            if gesture_id == 0:
-                print('================== STOP')
-                # self.forward_backward_vel = self.left_right_vel = \
-                #     self.up_down_vel = self.yaw_vel = 0
-                # self.send_tello_control()
-                return
-            # Back
-            if gesture_id == 1:
-                print('================== BACK')
-                # self.forward_backward_vel = -speed
-                # self.send_tello_control()
-                return
-            # Forward
-            if gesture_id == 2:
-                print('================== FORAWRD')
-                # self.forward_backward_vel = speed
-                # self.send_tello_control()
-                return
-            # Land
-            if gesture_id == 3: 
-                print('================== LAND')
-                # self.forward_backward_vel = self.left_right_vel = \
-                #     self.up_down_vel = self.yaw_vel = 0
-                # self.send_tello_control()
-                # self.tello.land()
-                return
-            # Photo
-            if gesture_id == 4:
-                print('================== PHOTO')
-                # self.take_tello_photo()
-                return
-            # Video
-            if gesture_id == 5:
-                print('================== VIDEO1')
-                # self.onoff_tello_video()
-                return
-            if gesture_id == 6:
-                print('================== VIDEO2')
-                # self.onoff_tello_video()
-                return
-            # Rock paper scissors
-            if gesture_id == 7:
-                print('================== 👊🏻👊🏼👊🏽👊🏾👊🏿')
-                return
+        # Stop
+        if gesture_id == 0:
+            self.forward_backward_vel = self.left_right_vel = \
+                self.up_down_vel = self.yaw_vel = 0
+            self.send_tello_control()
+            return
+        # Back
+        if gesture_id == 1:
+            self.forward_backward_vel = -speed
+            self.send_tello_control()
+            return
+        # Forward
+        if gesture_id == 2:
+            self.forward_backward_vel = speed
+            self.send_tello_control()
+            return
+        # Land
+        if gesture_id == 3: 
+            self.forward_backward_vel = self.left_right_vel = \
+                self.up_down_vel = self.yaw_vel = 0
+            self.send_tello_control()
+            self.tello.land()
+            return
+        # Photo
+        if gesture_id == 4:
+            self.take_tello_photo()
+            return
+        # Video
+        if gesture_id == 5:
+            self.onoff_tello_video()
+            return
+        if gesture_id == 6:
+            self.onoff_tello_video()
+            return
+        # Rock paper scissors
+        if gesture_id == 7:
+            print('================== 👊🏻👊🏼👊🏽👊🏾👊🏿')
+            return
 
 
     def send_tello_control(self):
