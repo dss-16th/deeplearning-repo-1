@@ -24,7 +24,7 @@ parser.add_argument('-ss', "--save_session", action='store_true',
                     help='add the -ss flag to save your session as an image sequence in the Sessions folder')
 parser.add_argument('-D', "--debug", action='store_true',
                     help='add the -D flag to enable debug mode. No need drone. Only print commands')
-parser.add_argument('-m', '--mode', type=str, default='m',
+parser.add_argument('-m', '--mode', type=str, default='g',
                     help='set start mode. k : keyboard control, m : mask detecting & tracking, g : gesture handing')                    
 args = parser.parse_args()
 
@@ -166,6 +166,10 @@ class FrontEnd(object):
             if self.tello_mode == 'm':
                 maskDetector.detect_mask(frame, szX, szY)
 
+
+            ## ==> GESTURE CONTROL MODE !!
+            if self.tello_mode == 'g':
+                gesture_controller.gesture_control()
 
             dCol = lerp(np.array((0, 0, 255)), np.array((255, 255, 255)), tDistance + 1 / 7)
 
