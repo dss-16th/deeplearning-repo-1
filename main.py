@@ -205,10 +205,10 @@ class FrontEnd(object):
                 cv2.putText(debug_image, owner_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
                 # ==> tracking gesture
-                debug_image = gesture_detector.draw_info(debug_image, fps, mode=0, number=-1)
+                debug_image = gesture_detector.draw_info(debug_image, fps_rounded, mode=0, number=-1)
 
                 # Battery status and image rendering
-                cv.putText(debug_image, "Battery: {}".format(battery_status), (10, 720 - 10),
+                cv.putText(debug_image, "Battery: {}%".format(battery_status), (10, 720 - 10),
                         cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                 cv.imshow('Tello Gesture Recognition', debug_image)
 

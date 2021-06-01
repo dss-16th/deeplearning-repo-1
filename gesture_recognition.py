@@ -478,7 +478,7 @@ class GestureRecognition:
 
 
 class GestureBuffer:
-    def __init__(self, buffer_len=10):
+    def __init__(self, buffer_len=20):
         self.buffer_len = buffer_len
         self._buffer = deque(maxlen=buffer_len)
 
