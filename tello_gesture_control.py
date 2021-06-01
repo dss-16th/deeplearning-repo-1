@@ -51,23 +51,16 @@ class TelloGestureController:
             return
         # Video
         if gesture_id == 5:
-            keepRecording = True
-            self.onoff_tello_video(gesture_id=5, keepRecording=keepRecording)
+            self.onoff_tello_video(gesture_id=5)
             return
         if gesture_id == 6:
-            recorder.join()
-            keepRecording = False
+            self.onoff_tello_video(gesture_id=6)
             print('VIDEO SAVEING DONE!')
-            # self.onoff_tello_video()
-            # keepRecording = False
-            # recorder = Thread(target=self.onoff_tello_video)
-            # recorder.join()
-            # return
+            return
         # Rock paper scissors
         if gesture_id == 7:
             print('================== 👊🏻👊🏼👊🏽👊🏾👊🏿')
             return
-
 
     def send_tello_control(self):
         self.tello.send_rc_control(self.left_right_vel, 
@@ -75,7 +68,6 @@ class TelloGestureController:
                                    self.up_down_vel, 
                                    self.yaw_vel)
         print('==============================send tello control')
-
 
     def take_tello_photo(self):
         photo = self.tello.get_frame_read().frame
@@ -88,37 +80,36 @@ class TelloGestureController:
             str(datetime.datetime.now()).split('.')[0].replace(':','-').replace(' ','-')), photo)
         print('IMAGE SAVEING DONE!', status)
 
-    def onoff_tello_video(self, gesture_id, keepRecording):
-        if (gesture_id == 5) & (keepRecording == True):
-            global video
-            frame_read = self.tello.get_frame_read()
-            video = frame_read.frame
-            video_dir = 'Videos'
-            if not os.path.isdir(video_dir):
-                os.mkdir(video_dir)
-                print('=======> MAKE A VIDEO DIRECTORY!')
+    def videoRecorder(self, keepRecording):
+        # create a VideoWrite object, recoring to ./video.avi
+        frame_read = self.tello.get_frame_read()
+        height, width, _ = frame_read.frame.shape
+        video_file = f"video_{datetime.now().strftime('%d-%m-%Y_%I-%M-%S_%p')}.mp4"
+        video = cv2.VideoWriter(video_file, cv2.VideoWriter_fourcc(*'MP4V'), 30, (width, height))
 
-                height, width, _ = frame_read.frame.shape
-                video_file = video_dir + f"/tello_video_{datetime.datetime.now().strftime('%d-%m-%Y_%I-%M-%S_%p')}.mp4"
-                video = cv2.VideoWriter(video_file, cv2.VideoWriter_fourcc(*'MP4V'), 30, (width, height))
+        while keepRecording:
+            video.write(frame_read.frame)
+            time.sleep(1 / 30)
 
-                while keepRecording:
-                    video.write(frame_read.frame)
-                    time.sleep(1 / 30)
+        video.release()
 
-                video.release()
-            
-            global recorder
-            recorder = Thread(target=self.onoff_tello_video(gesture_id=5, keepRecording=keepRecording))
+    def onoff_tello_video(self, gesture_id):
+        frame_read = self.tello.get_frame_read()
+        video = frame_read.frame
+
+        video_dir = 'Videos'
+        if not os.path.isdir(video_dir):
+            os.mkdir(video_dir)
+            print('=======> MAKE A VIDEO DIRECTORY!')
+
+        if gesture_id == 5:
+            keepRecording = True
+
+            recorder = Thread(target=self.videoRecorder)
             recorder.start()
 
-        # elif (gesture_id == 6) & (keepRecording == True):
-        #     keepRecording = False
-        #     recorder.join()
-        #     print('VIDEO SAVEING DONE!')
-            
-            # while True:
-            #     if gesture_id == 6:
-            #         keepRecording = False
-            #         recorder.join()
-            #         print('VIDEO SAVEING DONE!')
+        if gesture_id == 6:
+            keepRecording = False
+
+            recorder.join()
+            self.tello.streamoff()
