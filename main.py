@@ -8,6 +8,7 @@ from tello_withoutmask_tracking import MaskTracking
 from tello_gesture_control import TelloGestureController
 from gesture_recognition import *
 from owner_face_recognition import FaceRecognition
+from utils import *
 
 
 # standard argparse stuff
@@ -80,7 +81,7 @@ class FrontEnd(object):
         """
         k : keyboard control, 
         m : mask detecting & tracking, 
-        g : gesture handing
+        g : gesture handling
         """
         if key == ord('k'):
             self.tello_mode = 'k'
@@ -109,13 +110,13 @@ class FrontEnd(object):
         if self.tello_mode == 'k':
             keyboardController = KeyboardControler(self.tello)
 
-        elif self.tello_mode == 'm':
+        if self.tello_mode == 'm':
             maskDetector = MaskTracking(width, height, self.tello.takeoff, self.tello.send_rc_control, confidence=0.6)
 
-        elif self.tello_mode == 'g':
+        if self.tello_mode == 'g':
             face_checker = FaceRecognition()
-            gesture_controller = TelloGestureController(self.tello)
             gesture_detector = GestureRecognition()
+            gesture_controller = TelloGestureController(self.tello)
             gesture_buffer = GestureBuffer()
 
         # frame read
@@ -176,41 +177,43 @@ class FrontEnd(object):
             if self.tello_mode == 'm':
                 maskDetector.detect_mask(frame, szX, szY)
 
-
             ## ==> GESTURE CONTROL MODE !!
             if self.tello_mode == 'g':
                 owner_name = 'Nobody'
                 top, right, bottom, left = 0,0,0,0
+
                 try:
                     top, right, bottom, left, owner_name = face_checker.recognize(frame)
                 except:
                     pass
+
                 if (owner_name != 'Nobody') & (not self.is_flying):
-                    print('🚀🚀🚀 DRONE TAKES OFF !!')
                     self.is_flying == True
-                    
-                debug_image, gesture_id = gesture_detector.recognize(frame)
+                    print('🚀🚀🚀 DRONE TAKES OFF !!')
+                    self.tello.takeoff()
+
+                frame, gesture_id = gesture_detector.recognize(frame)
                 gesture_buffer.add_gesture(gesture_id)
                 gesture_controller.gesture_control(gesture_buffer)
-
-                fps = 1.0 /(time.time() - start_ts)
-                fps_rounded = round(fps, 2)
+            
+                # Draw a label with a name below the face
+                cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+                font = cv2.FONT_HERSHEY_DUPLEX
+                cv2.putText(frame, owner_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
                 # ==> tracking owner
-                cv2.rectangle(debug_image, (left, top), (right, bottom), (0, 0, 255), 2)
+                cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
-                # Draw a label with a name below the face
-                cv2.rectangle(debug_image, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-                font = cv2.FONT_HERSHEY_DUPLEX
-                cv2.putText(debug_image, owner_name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+            fps = 1.0 /(time.time() - start_ts)
+            fps_rounded = round(fps, 2)
 
-                # ==> tracking gesture
-                debug_image = gesture_detector.draw_info(debug_image, fps_rounded, mode=0, number=-1)
+            # ==> tracking gesture
+            frame = draw_info(frame, fps=fps_rounded, tello_mode=self.tello_mode)
 
-                # Battery status and image rendering
-                cv.putText(debug_image, "Battery: {}%".format(battery_status), (10, 720 - 10),
-                        cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                cv.imshow('Tello Gesture Recognition', debug_image)
+            # Battery status and image rendering
+            cv.putText(frame, "Battery: {}%".format(battery_status), (10, 720 - 10),
+                    cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            cv.imshow('DRONE', frame)
 
             # Display the resulting frame
             # cv2.imshow(f'Tello Tracking 🧟 ....', frame)

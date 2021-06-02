@@ -44,11 +44,11 @@ class MaskTracking:
         self.font = cv2.FONT_HERSHEY_PLAIN
         self.colors = np.random.uniform(0, 255, size=(len(self.classes), 3))
 
-    def is_with_mask(class_ids):
-        return 1 not in class_ids
+    def is_with_mask(self, class_ids):
+        return (1 not in class_ids)
 
-    def is_without_mask(class_ids):
-        return 1 in class_ids
+    def is_without_mask(self, class_ids):
+        return (1 in class_ids)
 
     def detect_mask(self, frame, szX, szY):
         start_time = time.time()
@@ -98,13 +98,13 @@ class MaskTracking:
 
             # 대기 상태
             if not self.is_flying:
-                if self.is_without_mask():
-                    print('🚀🚀🚀 DRONE TAKES OFF !!')
-                    self.takeoff()
+                if self.is_without_mask(class_ids):
+                    print('🚀🚀🚀 DRONE TAKES OFF MASK!!')
                     self.is_flying = True
+                    self.takeoff()
 
             else:
-                if self.is_with_mask():
+                if self.is_with_mask(class_ids):
                     iter_time = time.time() - start_time
                     self.all_with_mask_time += iter_time
                     print('all with_mask duration :',round(self.all_with_mask_time, 3))

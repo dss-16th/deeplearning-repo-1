@@ -17,15 +17,20 @@ class FaceRecognition:
         self.tello_owner_list, self.tello_owner_names = self.load_model()
 
     def load_model(self):
-        target_image = face_recognition.load_image_file("model/face_recognition/target_img/mieyhgnaj.jpg")
-        encoding_image = face_recognition.face_encodings(target_image)[0]
+        mieyghanj_image = face_recognition.load_image_file("model/face_recognition/target_img/mieyhgnaj.jpg")
+        mieyghanj_encoding = face_recognition.face_encodings(mieyghanj_image)[0]
+
+        dockyum_image = face_recognition.load_image_file("model/face_recognition/target_img/dockyum_2015.jpeg")
+        dockyum_encoding = face_recognition.face_encodings(dockyum_image)[0]
 
         # Create owner
         tello_owner_list = [
-            encoding_image
+            mieyghanj_encoding,
+            dockyum_encoding
         ]
         tello_owner_names = [
-            "mieyhgnaj"
+            "mieyhgnaj",
+            "dockyum_2015"
         ]
 
         return tello_owner_list, tello_owner_names
@@ -79,15 +84,3 @@ class FaceRecognition:
             left *= 4
 
             return top, right, bottom, left, name
-
-            # Draw a box around the face
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-
-            # Draw a label with a name below the face
-            cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-
-
-            # Display the resulting image
-            cv2.imshow('Video', frame) 

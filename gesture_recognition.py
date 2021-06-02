@@ -150,19 +150,23 @@ class GestureRecognition:
 
         return image
 
-    def draw_info(self, image, fps, mode, number):
+    def draw_info(self, image, fps, tello_mode):
         cv.putText(image, "FPS: " + str(fps), (10, 30), cv.FONT_HERSHEY_SIMPLEX,
                    1.0, (255, 255, 255), 2, cv.LINE_AA)
+        """
+        k : keyboard control, 
+        m : mask detecting & tracking, 
+        g : gesture handling
+        """
+        mode_string = ['KEYBOARD CONTROL', 'MASK DETECTING & TRACKING', 'GESTURE HANDLING']
+        dic = {'k':0, 'm':1, 'g':2}
 
-        mode_string = ['Logging Key Point', 'Logging Point History']
-        if 1 <= mode <= 2:
-            cv.putText(image, "MODE:" + mode_string[mode - 1], (10, 90),
-                       cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1,
-                       cv.LINE_AA)
-            if 0 <= number <= 9:
-                cv.putText(image, "NUM:" + str(number), (10, 110),
-                           cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1,
-                           cv.LINE_AA)
+        selected_mode_string = mode_string[dic[tello_mode]]
+
+        cv.putText(image, "MODE: " + selected_mode_string, (10, 65),
+                    cv.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 1,
+                    cv.LINE_AA)
+
         return image
 
     def _logging_csv(self, number, mode, landmark_list, point_history_list):
