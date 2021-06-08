@@ -6,8 +6,8 @@ import time
 from tello_keyboard_control import KeyboardControler
 from tello_withoutmask_tracking import MaskTracking
 from tello_gesture_control import TelloGestureController
-from gesture_recognition import *
-from owner_face_recognition import FaceRecognition
+from recognition_gesture import *
+from recognition_face import FaceRecognition
 from utils import *
 
 
