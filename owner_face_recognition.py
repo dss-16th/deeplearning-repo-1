@@ -1,37 +1,31 @@
-import face_recognition
+"""
+sample code from face_recognition github :
+https://github.com/ageitgey/face_recognition/blob/master/examples/facerec_from_webcam_faster.py
+
+"""
+import face_recognition as fr
 import cv2
+import os
+from os import path
 import numpy as np
-from djitellopy import Tello
 
-# This is a demo of running face recognition on live video from your webcam. It's a little more complicated than the
-# other example, but it includes some basic performance tweaks to make things run a lot faster:
-#   1. Process each video frame at 1/4 resolution (though still display it at full resolution)
-#   2. Only detect faces in every other frame of video.
-
-# PLEASE NOTE: This example requires OpenCV (the `cv2` library) to be installed only to read from your webcam.
-# OpenCV is *not* required to use the face_recognition library. It's only required if you want to run this
-# specific demo. If you have trouble installing it, try any of the other demos that don't require it instead.
 
 class FaceRecognition:
     def __init__(self):
         self.tello_owner_list, self.tello_owner_names = self.load_model()
 
     def load_model(self):
-        mieyghanj_image = face_recognition.load_image_file("model/face_recognition/target_img/mieyhgnaj.jpg")
-        mieyghanj_encoding = face_recognition.face_encodings(mieyghanj_image)[0]
+        # Load images
+        img_dir = 'model/face_recognition/target_img'
+        img_ext = ['.jpeg', '.jpg', '.png']
+        img_files = [file for file in os.listdir(img_dir) if path.splitext(file)[1] in img_ext]
 
-        dockyum_image = face_recognition.load_image_file("model/face_recognition/target_img/dockyum_2015.jpeg")
-        dockyum_encoding = face_recognition.face_encodings(dockyum_image)[0]
-
-        # Create owner
-        tello_owner_list = [
-            mieyghanj_encoding,
-            dockyum_encoding
-        ]
-        tello_owner_names = [
-            "mieyhgnaj",
-            "dockyum_2015"
-        ]
+        # find face in the image with 'HOG'
+        load_images = list(map(lambda x: fr.load_image_file(path.join(img_dir, x)), img_files))
+        # TODO : sometimes cant find face, needs handling errors. 
+        # update argument fr._raw_face_locations(model='cnn')
+        tello_owner_list = list(map(lambda x: fr.face_encodings(x)[0], load_images))
+        tello_owner_names = list(map(lambda x: path.splitext(x)[0], img_files))
 
         return tello_owner_list, tello_owner_names
 
@@ -50,22 +44,17 @@ class FaceRecognition:
         # Only process every other frame of video to save time
         if process_this_frame:
             # Find all the faces and face encodings in the current frame of video
-            face_locations = face_recognition.face_locations(rgb_small_frame)
-            face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+            face_locations = fr.face_locations(rgb_small_frame)
+            face_encodings = fr.face_encodings(rgb_small_frame, face_locations)
 
             face_names = []
             for face_encoding in face_encodings:
-                # See if the face is a match for the known face(s)
-                matches = face_recognition.compare_faces(self.tello_owner_list, face_encoding)
+                # See if the face is a match for the tello_owner_list
+                matches = fr.compare_faces(self.tello_owner_list, face_encoding)
                 name = "Unknown"
 
-                # # If a match was found in known_face_encodings, just use the first one.
-                # if True in matches:
-                #     first_match_index = matches.index(True)
-                #     name = known_face_names[first_match_index]
-
-                # Or instead, use the known face with the smallest distance to the new face
-                face_distances = face_recognition.face_distance(self.tello_owner_list, face_encoding)
+                # Use the known face with the smallest distance to the new face
+                face_distances = fr.face_distance(self.tello_owner_list, face_encoding)
                 best_match_index = np.argmin(face_distances)
                 if matches[best_match_index]:
                     name = self.tello_owner_names[best_match_index]
@@ -75,7 +64,7 @@ class FaceRecognition:
         process_this_frame = not process_this_frame
 
 
-        # Display the results
+        # Return the results
         for (top, right, bottom, left), name in zip(face_locations, face_names):
             # Scale back up face locations since the frame we detected in was scaled to 1/4 size
             top *= 4
