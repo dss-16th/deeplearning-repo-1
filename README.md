@@ -160,16 +160,102 @@
 
 ## 02 제스처 컨트롤
 
+(유튜브 영상)
+
 </br>
 
+### MediaPipe
+
+<img align="right" src="https://user-images.githubusercontent.com/73205057/121664322-53116280-cae2-11eb-8ae7-e925de413c3a.gif" width="500">
+
+- 머신러닝 파이프 라인 구축을 위한 프레임 워크
+- 비디오, 오디오, 시계열 데이터 등의 다양한 모드와
+Android, iOS, 웹 등의 플랫폼에 적용 가능
+- pip install mediapipe
+
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+
+### hand gesture
+
+```
+👏🏻 총 7가지의 제스처를 사용했다!
+```
+
+<img src="https://user-images.githubusercontent.com/73205057/121664654-a97ea100-cae2-11eb-8766-122a6811c347.png" width="270">
+
+</br>
+
+### 제스처 학습
+
+```
+✌🏻 거리 상관없이 인식이 잘 되게 하기 위한 노력
+```
+
+<img src="https://user-images.githubusercontent.com/73205057/121665763-7e488180-cae3-11eb-93db-1fc425feff52.gif" width="700">
+&emsp; &emsp; &emsp; &emsp; &emsp; &emsp; 가까운 거리 &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; 먼 거리
+
+</br>
+</br>
+
+### 학습의 중요성
+
+```
+🥺 뒤로 가라고 했는데.. 난데없이 착지를 한다..
+```
+
+<img src="https://user-images.githubusercontent.com/73205057/121666601-69202280-cae4-11eb-8396-022f0025d423.gif" width="700">
+
+</br>
+
+### 낮은 버퍼
+
+```
+😓 사진이 거의 1초 단위로 찍힌다.. ⇒ buffer_len=20 으로 수정
+```
+
+<img src="https://user-images.githubusercontent.com/73205057/121666886-b4d2cc00-cae4-11eb-8812-538956ffe238.png" width="700">
+
 ## 03 얼굴 인식으로 주인 확인
+
+<img src="https://user-images.githubusercontent.com/73205057/121667409-34609b00-cae5-11eb-90a6-3960c44f2740.gif" width="450">
+
+</br>
+
+### face_recognition
+- 딥러닝 기반으로 제작된 dlib의 최첨단 얼굴 인식 기능을 사용하여 구축
+- 13,000개 이상의 얼굴 이미지가 포함된 Labeled Faces in the Wild 기준으로
+정확도가 무려 99.38%
+- 단 한장의 사진으로 얼굴 인식 가능…!.!
+- wow 😲
+- pip install face_recognition
 
 </br>
 
 ## 프로젝트 회고
 
+### 시도해 본 face recognition github repo 리스트..
+
+- [https://github.com/davidsandberg/facenet](https://github.com/davidsandberg/facenet)
+- [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface)
+- [https://github.com/Skuldur/facenet-face-recognition](https://github.com/Skuldur/facenet-face-recognition)
+- [https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
+- [https://github.com/fyr91/face_recognition](https://github.com/fyr91/face_recognition)
+- [https://github.com/ageitgey/face_recognition](https://github.com/ageitgey/face_recognition)
+
 </br>
 
 ## REFERENCE
 
-</br>
+- F. Schroff, D. Kalenichenko and J. Philbin, "FaceNet: A unified embedding for face recognition and clustering," 2015 IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2015, pp. 815-823, doi: 10.1109/CVPR.2015.7298682. ([https://arxiv.org/abs/1503.03832](https://arxiv.org/abs/1503.03832))
