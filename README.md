@@ -8,7 +8,9 @@
 
 </br>
 
-왜 드론이었나
+```
+🛸 왜 드론이었나
+```
 
 </br>
 
@@ -26,8 +28,11 @@
 
 </br>
 
-(다은찡 영상)
+&emsp; <img src="https://user-images.githubusercontent.com/73205057/121772913-7b1cc680-cbb3-11eb-96a7-4de7741c8658.gif" width="500">
 
+&emsp; (얼굴 인식으로 드론을 이륙시키고, 제스처로 조종하는 중)
+
+</br>
 </br>
 
 ## 프로젝트 개요
@@ -93,7 +98,7 @@
 
 ## 01 마스크 미착용자 트래킹
 
-(용하 영상)
+<img src="https://user-images.githubusercontent.com/73205057/121772841-0d709a80-cbb3-11eb-9282-c72dedfb99ff.gif" width="500">
 
 </br>
 
@@ -117,9 +122,15 @@
 
 </br>
 
-근데 속도가....
+<img src="https://user-images.githubusercontent.com/73205057/121773042-4b21f300-cbb4-11eb-9ea7-4ef1970c5d1d.gif" height="70">
+<img src="https://user-images.githubusercontent.com/73205057/121773044-4c532000-cbb4-11eb-924b-cd840baaf003.gif" height="70">
 
-(영상 두개)
+</br>
+
+```
+🤦🏻‍♂️ 근데 mask detecting & tracking mode의 속도가 keyboard control mode와 비교해서 굉장히 느리다..
+   그래서인지 사람이 빠르게 지나가면 드론은 잡지 못한다..
+```
 
 </br>
 
@@ -162,7 +173,9 @@
 
 ## 02 제스처 컨트롤
 
-(유튜브 영상)
+<div align="left">
+  <a href="https://youtu.be/EpHT2bJ2jco"><img src="https://user-images.githubusercontent.com/73205057/121773389-a2c15e00-cbb6-11eb-8a7d-cd2a78ec35ae.png" width="700" alt="IMAGE ALT TEXT"></a>
+</div>
 
 </br>
 
