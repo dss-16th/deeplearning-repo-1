@@ -4,7 +4,7 @@
 - 기간 : 2021. 05. 03. ~ 2021. 06. 03.
 - [김도겸](https://github.com/dockyum) : 드론 동작 프로그래밍, 모듈화
 - [장혜임](https://github.com/mieyhgnaj) : 레퍼런스 조사(object tracking, face recognition)
-- 발표자료
+- [발표자료](https://www.icloud.com/keynote/0KOTU2vOxqReZHmUsTAo-_5cg#How_to_Train_Your_Drone)
 
 </br>
 
