@@ -3,18 +3,9 @@
 - 딥러닝을 활용하여 손동작으로 드론을 조종한다.
 - 기간 : 2021. 05. 03. ~ 2021. 06. 03.
 - [김도겸](https://github.com/dockyum) : 드론 동작 프로그래밍, 모듈화
-- [장혜임](https://github.com/mieyhgnaj) : 레퍼런스 조사(object tracking, face recognition)
-- [발표자료](https://www.icloud.com/keynote/0KOTU2vOxqReZHmUsTAo-_5cg#How_to_Train_Your_Drone)
+- [장혜임](https://github.com/mieyhgnaj) : 레퍼런스 조사(object tracking, gesture control, face recognition), 드론에 적용 테스트
+- 👉🏼 [발표자료](https://www.icloud.com/keynote/0KOTU2vOxqReZHmUsTAo-_5cg#How_to_Train_Your_Drone)
 
-</br>
-
-```
-🛸 왜 드론이었나
-```
-
-</br>
-
-(고민중)
 
 </br>
 
@@ -32,7 +23,7 @@
 
 &emsp; (얼굴 인식으로 드론을 이륙시키고, 제스처로 조종하는 중)
 
-</br>
+
 </br>
 
 ## 프로젝트 개요
@@ -66,7 +57,7 @@
 - 최대속도 : 8m/s
 - 영상 : 720p
 - 2.4GHz Wi-Fi 지원
-- 19만원 (추가 배터리 포함)
+- 약 19만원 (추가 배터리 포함)
 
 </br>
 
@@ -252,7 +243,7 @@ Android, iOS, 웹 등의 플랫폼에 적용 가능
 - 딥러닝 기반으로 제작된 dlib의 최첨단 얼굴 인식 기능을 사용하여 구축
 - 13,000개 이상의 얼굴 이미지가 포함된 Labeled Faces in the Wild 기준으로
 정확도가 무려 99.38%
-- 단 한장의 사진으로 얼굴 인식 가능…!.!
+- 단 한장의 사진으로 얼굴 인식 가능!.!
 - wow 😲
 - pip install face_recognition
 
@@ -260,7 +251,7 @@ Android, iOS, 웹 등의 플랫폼에 적용 가능
 
 ## 프로젝트 회고
 
-### 시도해 본 face recognition github repo 리스트..
+### 시도해 본 "face recognition" 관련 github repo 리스트..
 
 - [https://github.com/davidsandberg/facenet](https://github.com/davidsandberg/facenet)
 - [https://github.com/cmusatyalab/openface](https://github.com/cmusatyalab/openface)
